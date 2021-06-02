@@ -8,6 +8,8 @@ import {DomHandler, ConnectedOverlayScrollHandler} from 'primeng/dom';
 import {SharedModule,PrimeTemplate,PrimeNGConfig,TranslationKeys} from 'primeng/api';
 import {NG_VALUE_ACCESSOR, ControlValueAccessor} from '@angular/forms';
 import {Subscription} from 'rxjs';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import { Directionality } from '@angular/cdk/bidi';
 
 export const CALENDAR_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR,
@@ -31,7 +33,7 @@ export interface LocaleSettings {
 @Component({
     selector: 'p-calendar',
     template:  `
-        <span #container [ngClass]="{'p-calendar':true, 'p-calendar-w-btn': showIcon, 'p-calendar-timeonly': timeOnly, 'p-calendar-disabled':disabled, 'p-focus': focus}" [ngStyle]="style" [class]="styleClass">
+        <span #container [ngClass]="{'p-calendar':true, 'p-calendar-rtl':rtl,'p-calendar-w-btn': showIcon, 'p-calendar-timeonly': timeOnly, 'p-calendar-disabled':disabled, 'p-focus': focus}" [ngStyle]="style" [class]="styleClass">
             <ng-template [ngIf]="!inline">
                 <input #inputfield type="text" [attr.id]="inputId" [attr.name]="name" [attr.required]="required" [attr.aria-required]="required" [value]="inputFieldValue" (focus)="onInputFocus($event)" (keydown)="onInputKeydown($event)" (click)="onInputClick()" (blur)="onInputBlur($event)"
                     [readonly]="readonlyInput" (input)="onUserInput($event)" [ngStyle]="inputStyle" [class]="inputStyleClass" [placeholder]="placeholder||''" [disabled]="disabled" [attr.tabindex]="tabindex" [attr.inputmode]="touchUI ? 'off' : null"
@@ -51,7 +53,7 @@ export interface LocaleSettings {
                         <div class="p-datepicker-group" *ngFor="let month of months; let i = index;">
                             <div class="p-datepicker-header">
                                 <button (keydown)="onContainerButtonKeydown($event)" class="p-datepicker-prev p-link" (click)="onPrevButtonClick($event)" *ngIf="i === 0" type="button" pRipple>
-                                    <span class="p-datepicker-prev-icon pi pi-chevron-left"></span>
+                                    <span [ngClass]="{'p-datepicker-prev-icon pi':true, 'pi-chevron-left' : !rtl,'pi-chevron-right' : rtl}"></span>
                                 </button>
                                 <div class="p-datepicker-title">
                                     <span class="p-datepicker-month" *ngIf="!monthNavigator && (view !== 'month')">{{getTranslation('monthNames')[month.month]}}</span>
@@ -64,7 +66,7 @@ export interface LocaleSettings {
                                     <span class="p-datepicker-year" *ngIf="!yearNavigator">{{view === 'month' ? currentYear : month.year}}</span>
                                 </div>
                                 <button (keydown)="onContainerButtonKeydown($event)" class="p-datepicker-next p-link" (click)="onNextButtonClick($event)" *ngIf="numberOfMonths === 1 ? true : (i === numberOfMonths -1)" type="button" pRipple>
-                                    <span class="p-datepicker-next-icon pi pi-chevron-right"></span>
+                                    <span [ngClass]="{'p-datepicker-next-icon pi':true, 'pi-chevron-right' : !rtl,'pi-chevron-left' : rtl}"></span>
                                 </button>
                             </div>
                             <div class="p-datepicker-calendar-container" *ngIf="view ==='date'">
@@ -543,9 +545,15 @@ export class Calendar implements OnInit,OnDestroy,ControlValueAccessor {
         console.warn("Locale property has no effect, use new i18n API instead.");
     }
 
-    constructor(public el: ElementRef, public renderer: Renderer2, public cd: ChangeDetectorRef, private zone: NgZone, private config: PrimeNGConfig) {}
+    @Input() rtl: boolean = undefined;
+
+    constructor(public el: ElementRef, public renderer: Renderer2, public cd: ChangeDetectorRef, private zone: NgZone, protected config: PrimeNGConfig, protected dir: Directionality) {}
 
     ngOnInit() {
+        if (this.rtl === undefined){
+            this.rtl = this.dir.value === 'rtl';
+        }
+
         const date = this.defaultDate||new Date();
         this.currentMonth = date.getMonth();
         this.currentYear = date.getFullYear();
@@ -2597,8 +2605,8 @@ export class Calendar implements OnInit,OnDestroy,ControlValueAccessor {
 }
 
 @NgModule({
-    imports: [CommonModule,ButtonModule,SharedModule,RippleModule],
-    exports: [Calendar,ButtonModule,SharedModule],
+    imports: [CommonModule,ScrollingModule,ButtonModule,SharedModule,RippleModule],
+    exports: [Calendar,ScrollingModule,ButtonModule,SharedModule],
     declarations: [Calendar]
 })
 export class CalendarModule { }
