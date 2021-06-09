@@ -220,6 +220,7 @@ export class MultiCalendar extends Calendar {
         this.showIcon = true;
         this.monthNavigator = true;
         this.yearNavigator = true;
+        this.yearRange = '2000:2030';
 
         this.calendarSelectIconMenuItems = [{
             label: 'Jalali',
@@ -259,7 +260,7 @@ export class MultiCalendar extends Calendar {
                 return jj;
             default:
                 return moment(date);
-        }
+    }
     }
 
     set defaultDate(defaultDate: Date) {
@@ -417,6 +418,7 @@ export class MultiCalendar extends Calendar {
 
             if (i === 0) {
                 for (let j = (prevMonthDaysLength - firstDay + 1); j <= prevMonthDaysLength; j++) {
+                    let prev = this.getPreviousMonthAndYear(month, year);
                     week.push({
                         day: j,
                         month: prevMonthMonth,
@@ -442,6 +444,7 @@ export class MultiCalendar extends Calendar {
             else {
                 for (let j = 0; j < 7; j++) {
                     if (dayNo > daysLength) {
+                        let next = this.getNextMonthAndYear(month, year);
                         week.push({
                             day: dayNo - daysLength,
                             month: nextMonthMonth,
