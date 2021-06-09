@@ -1874,12 +1874,12 @@ export class Table implements OnInit, AfterViewInit, AfterContentInit, Blockable
                 if (event.pageX > columnCenter) {
                     this.reorderIndicatorUpViewChild.nativeElement.style.left = (targetLeft + dropHeader.offsetWidth - Math.ceil(this.reorderIconWidth / 2)) + 'px';
                     this.reorderIndicatorDownViewChild.nativeElement.style.left = (targetLeft + dropHeader.offsetWidth - Math.ceil(this.reorderIconWidth / 2)) + 'px';
-                    this.dropPosition = 1;
+                    this.dropPosition = this.rtl ?  -1 : 1;
                 }
                 else {
                     this.reorderIndicatorUpViewChild.nativeElement.style.left = (targetLeft - Math.ceil(this.reorderIconWidth / 2)) + 'px';
                     this.reorderIndicatorDownViewChild.nativeElement.style.left = (targetLeft - Math.ceil(this.reorderIconWidth / 2)) + 'px';
-                    this.dropPosition = -1;
+                    this.dropPosition = this.rtl ?  1 : -1;
                 }
 
                 if ((dropIndex - dragIndex === 1 && this.dropPosition === -1) || (dropIndex - dragIndex === -1 && this.dropPosition === 1)) {
