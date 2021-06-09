@@ -65,11 +65,35 @@ export class PrimeNGConfig {
         upload: 'Upload',
         cancel: 'Cancel',
         dayNames: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        dayNames_jalali: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        dayNames_fa: ["یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنجشنبه", "جمعه", "شنبه"],
+        dayNames_jalali_fa: ["یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنجشنبه", "جمعه", "شنبه"],
+
         dayNamesShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+        dayNamesShort_jalali: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+        dayNamesShort_fa: ["ی", "د", "س", "چ", "پ", "ج", "ش"],
+        dayNamesShort_jalali_fa: ["ی", "د", "س", "چ", "پ", "ج", "ش"],
+
         dayNamesMin: ["Su","Mo","Tu","We","Th","Fr","Sa"],
+        dayNamesMin_jalali: ["Su","Mo","Tu","We","Th","Fr","Sa"],
+        dayNamesMin_fa: ["ی", "د", "س", "چ", "پ", "ج", "ش"],
+        dayNamesMin_jalali_fa: ["ی", "د", "س", "چ", "پ", "ج", "ش"],
+
         monthNames: ["January","February","March","April","May","June","July","August","September","October","November","December"],
+        monthNames_jalali: ["ّFarvardin","Ordibehesht","Khordad","Tir","Mordad","Shahrivar","Mehr","Aban","Azar","Dey","Bahman","Esfand"],
+        monthNames_fa: ["ژانویه","فوریه","مارس","آوریل","می","جون","جولای","آگوست","سپتامبر","اکتبر","نوامبر","دسامبر"],
+        monthNames_jalali_fa: ["فروردین","اردیبهشت","خرداد","تیر","مرداد","شهریور","مهر","آبان","آذر","دی","بهمن","اسفند"],
+
         monthNamesShort: ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        monthNamesShort_jalali: ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        monthNamesShort_fa: ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        monthNamesShort_jalali_fa: ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+
         today: 'Today',
+        today_jalali: 'Today',
+        today_fa: 'امروز',
+        today_jalali_fa: 'امروز',
+
         weekHeader: 'Wk',
         weak: 'Weak',
         medium: 'Medium',

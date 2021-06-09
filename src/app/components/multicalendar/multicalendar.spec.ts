@@ -1,6 +1,6 @@
 import { TestBed, ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { Calendar } from './calendar';
+import { MultiCalendar } from './multicalendar';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
@@ -9,8 +9,8 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('Calendar', () => {
 
-	let calendar: Calendar;
-	let fixture: ComponentFixture<Calendar>;
+	let calendar: MultiCalendar;
+    let fixture: ComponentFixture<MultiCalendar>;
 
 	beforeEach(() => {
 		TestBed.configureTestingModule({
@@ -22,11 +22,11 @@ describe('Calendar', () => {
 				ButtonModule
 			],
 			declarations: [
-				Calendar,
+                MultiCalendar,
 			]
 		});
 
-		fixture = TestBed.createComponent(Calendar);
+        fixture = TestBed.createComponent(MultiCalendar);
 		calendar = fixture.componentInstance;
 	});
 

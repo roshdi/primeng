@@ -14,6 +14,8 @@ import { MenuModule } from 'primeng/menu';
 
 import * as moment from 'moment';
 import * as jalaliMoment from 'jalali-moment';
+import * as jalaMoment from 'jalali-moment';
+import { Directionality } from '@angular/cdk/bidi';
 
 
 export const MultiCALENDAR_VALUE_ACCESSOR: any = {
@@ -38,7 +40,7 @@ export interface LocaleSettings {
 @Component({
     selector: 'p-multicalendar',
     template: `
-        <span #container [ngClass]="{'p-calendar':true, 'p-calendar-w-btn': showIcon, 'p-calendar-timeonly': timeOnly, 'p-calendar-disabled':disabled, 'p-focus': focus}" [ngStyle]="style" [class]="styleClass">
+        <span #container [ngClass]="{'p-calendar':true, 'p-calendar-rtl':rtl, 'p-calendar-w-btn': showIcon, 'p-calendar-timeonly': timeOnly, 'p-calendar-disabled':disabled, 'p-focus': focus}" [ngStyle]="style" [class]="styleClass">
             <ng-template [ngIf]="!inline">
                 <input #inputfield type="text" [attr.id]="inputId" [attr.name]="name" [attr.required]="required" [attr.aria-required]="required" [value]="inputFieldValue" (focus)="onInputFocus($event)" (keydown)="onInputKeydown($event)" (click)="onInputClick()" (blur)="onInputBlur($event)"
                     [readonly]="readonlyInput" (input)="onUserInput($event)" [ngStyle]="inputStyle" [class]="inputStyleClass" [placeholder]="placeholder||''" [disabled]="disabled" [attr.tabindex]="tabindex" [attr.inputmode]="touchUI ? 'off' : null"
@@ -61,7 +63,7 @@ export interface LocaleSettings {
                         <div class="p-datepicker-group" *ngFor="let month of months; let i = index;">
                             <div class="p-datepicker-header">
                                 <button (keydown)="onContainerButtonKeydown($event)" class="p-datepicker-prev p-link" (click)="onPrevButtonClick($event)" *ngIf="i === 0" type="button" pRipple>
-                                    <span class="p-datepicker-prev-icon pi pi-chevron-left"></span>
+                                    <span [ngClass]="{'p-datepicker-prev-icon pi':true, 'pi-chevron-left' : !rtl,'pi-chevron-right' : rtl}"></span>
                                 </button>
                                 <div class="p-datepicker-title">
                                     <span class="p-datepicker-month" *ngIf="!monthNavigator && (view !== 'month')">{{getTranslation('monthNames')[month.month]}}</span>
@@ -74,7 +76,7 @@ export interface LocaleSettings {
                                     <span class="p-datepicker-year" *ngIf="!yearNavigator">{{view === 'month' ? currentYear : month.year}}</span>
                                 </div>
                                 <button (keydown)="onContainerButtonKeydown($event)" class="p-datepicker-next p-link" (click)="onNextButtonClick($event)" *ngIf="numberOfMonths === 1 ? true : (i === numberOfMonths -1)" type="button" pRipple>
-                                    <span class="p-datepicker-next-icon pi pi-chevron-right"></span>
+                                    <span [ngClass]="{'p-datepicker-next-icon pi':true, 'pi-chevron-right' : !rtl,'pi-chevron-left' : rtl}"></span>
                                 </button>
                             </div>
                             <div class="p-datepicker-calendar-container" *ngIf="view ==='date'">
@@ -213,10 +215,8 @@ export class MultiCalendar extends Calendar {
 
     calendarSelectIconMenuItems: MenuItem[] = [];
 
-    calendarType: CalendarType = CalendarType.Gregorian;
-
-    constructor(el: ElementRef, renderer: Renderer2, cd: ChangeDetectorRef, zone: NgZone, config: PrimeNGConfig) {
-        super(el, renderer, cd, zone, config);
+    constructor(el: ElementRef, renderer: Renderer2, cd: ChangeDetectorRef, zone: NgZone, config: PrimeNGConfig, dir: Directionality) {
+        super(el, renderer, cd, zone, config, dir);
         this.showIcon = true;
         this.monthNavigator = true;
         this.yearNavigator = true;
@@ -230,12 +230,37 @@ export class MultiCalendar extends Calendar {
         }];
     }
 
+    _calendarType: CalendarType = CalendarType.Jalali;
+    get calendarType(): CalendarType {
+        return this._calendarType;
+    }
+    set calendarType(value: CalendarType) {
+        if (this._calendarType === value) {
+            return;
+        }
+        this._calendarType = value;
+        this.initializeParams();
+    }
+
+    initializeParams() {
+        switch (this.calendarType) {
+            case CalendarType.Jalali:
+                this.firstDayOfWeek = 6;
+                break;
+            default:
+                this.firstDayOfWeek = 0;
+                break;
+        }
+    }
+
     getMoment(date: Date): moment.Moment {
-        const m = moment(date);
-        const jm = moment();
-        const jj = jalaliMoment(date).locale('fa');
-        Object.assign(jm, jj);
-        return jm;
+        switch (this.calendarType) {
+            case CalendarType.Jalali:
+                const jj: any = jalaliMoment(date).locale('fa');
+                return jj;
+            default:
+                return moment(date);
+    }
     }
 
     set defaultDate(defaultDate: Date) {
@@ -250,9 +275,46 @@ export class MultiCalendar extends Calendar {
         }
     }
 
+    ngOnInit() {
+        if (this.rtl === undefined) {
+            this.rtl = this.dir.value === 'rtl';
+        }
+        if (this.yearRange === undefined) {
+            switch (this.calendarType) {
+                case CalendarType.Jalali:
+                    this.yearRange = '1310:1410';
+                    break;
+                default:
+                    this.yearRange = '2000:2030';
+                    break;
+            }
+        }
+        this.initializeParams();
+        const date = this.defaultDate || new Date();
+        const momentDate = this.getMoment(date);
+        this.currentMonth = momentDate.month();
+        this.currentYear = momentDate.year();
+
+        if (this.view === 'date') {
+            this.createWeekDays();
+            this.initTime(date);
+            this.createMonths(this.currentMonth, this.currentYear);
+            this.ticksTo1970 = (((1970 - 1) * 365 + Math.floor(1970 / 4) - Math.floor(1970 / 100) + Math.floor(1970 / 400)) * 24 * 60 * 60 * 10000000);
+        }
+        else if (this.view === 'month') {
+            this.createMonthPickerValues();
+        }
+
+        this.translationSubscription = this.config.translationObserver.subscribe(() => {
+            this.createWeekDays();
+        });
+
+        this.initialized = true;
+    }
+
     updateUI() {
         let val = this.value || this.defaultDate || new Date();
-        if (Array.isArray(val)){
+        if (Array.isArray(val)) {
             val = val[0];
         }
         const momentDate = this.getMoment(val);
@@ -270,39 +332,111 @@ export class MultiCalendar extends Calendar {
     createMonth(month: number, year: number) {
         switch (this.calendarType) {
             case CalendarType.Jalali:
-                return this.createJalaliMonth(month, year);
+                return this.jalaliCreateMonth(month, year);
             default:
                 return super.createMonth(month, year);
         }
     }
+    isSelectable(day, month, year, otherMonth): boolean {
+        switch (this.calendarType) {
+            case CalendarType.Jalali:
+                return this.jalaliIsSelectable(day, month, year, otherMonth);
+            default:
+                return super.isSelectable(day, month, year, otherMonth);
+        }
+    }
+    isDateEquals(value, dateMeta): boolean {
+        switch (this.calendarType) {
+            case CalendarType.Jalali:
+                return this.jalaliIsDateEquals(value, dateMeta);
+            default:
+                return super.isDateEquals(value, dateMeta);
+        }
+    }
+    formatDate(date, format): string {
+        switch (this.calendarType) {
+            case CalendarType.Jalali:
+                return this.jalaliFormatDate(date, format);
+            default:
+                return super.formatDate(date, format);
+        }
+    }
+    selectDate(dateMeta): void {
+        switch (this.calendarType) {
+            case CalendarType.Jalali:
+                this.jalaliSelectDate(dateMeta);
+                break;
+            default:
+                super.selectDate(dateMeta);
+                break;
+        }
+    }
+    getTranslation(option: string) {
+        if (this.rtl) {
+            switch (this.calendarType) {
+                case CalendarType.Jalali:
+                    return super.getTranslation(option + '_jalali_fa');
+                default:
+                    return super.getTranslation(option + '_fa');
+            }
+        }
+        else {
+            switch (this.calendarType) {
+                case CalendarType.Jalali:
+                    return super.getTranslation(option + '_jalali');
+                default:
+                    return super.getTranslation(option);
+            }
+        }
+    }
+    jalaliCreateMonth(month: number, year: number) {
+        const currentDate = jalaliMoment.from(`${year}/${month + 1}/01`, 'fa', 'YYYY/M/DD').locale('fa');
 
-    createJalaliMonth(month: number, year: number) {
-        let dates = [];
-        let firstDay = this.getFirstDayOfMonthIndex(month, year);
-        let daysLength = this.getDaysCountInMonth(month, year);
-        let prevMonthDaysLength = this.getDaysCountInPrevMonth(month, year);
+        const prevDate = currentDate.clone().subtract(1, 'month');
+        const prevMonthYear = prevDate.year();
+        const prevMonthMonth = prevDate.month();
+
+        const nextDate = currentDate.clone().add(1, 'month');
+        const nextMonthYear = nextDate.year();
+        const nextMonthMonth = nextDate.month();
+
+        const today = jalaliMoment(new Date()).locale('fa');
+        const todayYear = today.year();
+        const todayMonth = today.month();
+        const todayDay = today.date();
+
+        const dates = [];
+        const firstDay = currentDate.weekday();
+        const daysLength = currentDate.daysInMonth();
+        const prevMonthDaysLength = prevDate.daysInMonth();
         let dayNo = 1;
-        let today = new Date();
-        let weekNumbers = [];
-        let monthRows = Math.ceil((daysLength + firstDay) / 7);
+        const weekNumbers = [];
+        const monthRows = Math.ceil((daysLength + firstDay) / 7);
 
         for (let i = 0; i < monthRows; i++) {
-            let week = [];
+            const week = [];
 
-            if (i == 0) {
+            if (i === 0) {
                 for (let j = (prevMonthDaysLength - firstDay + 1); j <= prevMonthDaysLength; j++) {
                     let prev = this.getPreviousMonthAndYear(month, year);
                     week.push({
-                        day: j, month: prev.month, year: prev.year, otherMonth: true,
-                        today: this.isToday(today, j, prev.month, prev.year), selectable: this.isSelectable(j, prev.month, prev.year, true)
+                        day: j,
+                        month: prevMonthMonth,
+                        year: prevMonthYear,
+                        otherMonth: true,
+                        today: todayYear === prevMonthYear && todayMonth === prevMonthMonth && todayDay === j,
+                        selectable: this.jalaliIsSelectable(j, prevMonthMonth, prevMonthYear, true)
                     });
                 }
 
-                let remainingDaysLength = 7 - week.length;
+                const remainingDaysLength = 7 - week.length;
                 for (let j = 0; j < remainingDaysLength; j++) {
                     week.push({
-                        day: dayNo, month: month, year: year, today: this.isToday(today, dayNo, month, year),
-                        selectable: this.isSelectable(dayNo, month, year, false)
+                        day: dayNo,
+                        month,
+                        year,
+                        today: todayYear === year && todayMonth === month && todayDay === dayNo,
+                        selectable: this.jalaliIsSelectable(dayNo, month, year, false)
                     });
                     dayNo++;
                 }
@@ -312,15 +446,21 @@ export class MultiCalendar extends Calendar {
                     if (dayNo > daysLength) {
                         let next = this.getNextMonthAndYear(month, year);
                         week.push({
-                            day: dayNo - daysLength, month: next.month, year: next.year, otherMonth: true,
-                            today: this.isToday(today, dayNo - daysLength, next.month, next.year),
-                            selectable: this.isSelectable((dayNo - daysLength), next.month, next.year, true)
+                            day: dayNo - daysLength,
+                            month: nextMonthMonth,
+                            year: nextMonthYear,
+                            otherMonth: true,
+                            today: todayYear === nextMonthYear && todayMonth === nextMonthMonth && todayDay === (dayNo - daysLength),
+                            selectable: this.jalaliIsSelectable((dayNo - daysLength), nextMonthMonth, nextMonthYear, true)
                         });
                     }
                     else {
                         week.push({
-                            day: dayNo, month: month, year: year, today: this.isToday(today, dayNo, month, year),
-                            selectable: this.isSelectable(dayNo, month, year, false)
+                            day: dayNo,
+                            month,
+                            year,
+                            today: todayYear === year && todayMonth === month && todayDay === dayNo,
+                            selectable: this.jalaliIsSelectable(dayNo, month, year, false)
                         });
                     }
 
@@ -336,11 +476,136 @@ export class MultiCalendar extends Calendar {
         }
 
         return {
-            month: month,
-            year: year,
-            dates: dates,
-            weekNumbers: weekNumbers
+            month,
+            year,
+            dates,
+            weekNumbers
         };
+    }
+
+    jalaliIsSelectable(day, month, year, otherMonth): boolean {
+        let validMin = true;
+        let validMax = true;
+        let validDate = true;
+        let validDay = true;
+
+        if (otherMonth && !this.selectOtherMonths) {
+            return false;
+        }
+
+        if (this.minDate) {
+            const jalaMinDate = this.getMoment(this.minDate);
+            if (jalaMinDate.year() > year) {
+                validMin = false;
+            }
+            else if (jalaMinDate.year() === year) {
+                if (jalaMinDate.month() > month) {
+                    validMin = false;
+                }
+                else if (jalaMinDate.month() === month) {
+                    if (jalaMinDate.date() > day) {
+                        validMin = false;
+                    }
+                }
+            }
+        }
+
+        if (this.maxDate) {
+            const jalaMaxDate = this.getMoment(this.maxDate);
+            if (jalaMaxDate.year() < year) {
+                validMax = false;
+            }
+            else if (jalaMaxDate.year() === year) {
+                if (jalaMaxDate.month() < month) {
+                    validMax = false;
+                }
+                else if (jalaMaxDate.month() === month) {
+                    if (jalaMaxDate.date() < day) {
+                        validMax = false;
+                    }
+                }
+            }
+        }
+
+        if (this.disabledDates) {
+            validDate = !this.isDateDisabled(day, month, year);
+        }
+
+        if (this.disabledDays) {
+            validDay = !this.isDayDisabled(day, month, year)
+        }
+
+        return validMin && validMax && validDate && validDay;
+    }
+    jalaliIsDateEquals(value, dateMeta): boolean {
+        if (value) {
+            const jalaliValue = jalaMoment(value).locale('fa');
+            return jalaliValue.date() === dateMeta.day && jalaliValue.month() === dateMeta.month && jalaliValue.year() === dateMeta.year;
+        }
+        return false;
+    }
+    jalaliFormatDate(date, format): string {
+        return jalaliMoment(date).locale('fa').format('YYYY/MM/DD');
+    }
+    jalaliSelectDate(dateMeta): void {
+        let date = jalaMoment.from(`${dateMeta.year}/${dateMeta.month + 1}/${dateMeta.day}`, 'fa', 'YYYY/M/D').toDate();
+
+        if (this.showTime) {
+            if (this.hourFormat == '12') {
+                if (this.currentHour === 12)
+                    date.setHours(this.pm ? 12 : 0);
+                else
+                    date.setHours(this.pm ? this.currentHour + 12 : this.currentHour);
+            }
+            else {
+                date.setHours(this.currentHour);
+            }
+
+            date.setMinutes(this.currentMinute);
+            date.setSeconds(this.currentSecond);
+        }
+
+        if (this.minDate && this.minDate > date) {
+            date = this.minDate;
+            this.setCurrentHourPM(date.getHours());
+            this.currentMinute = date.getMinutes();
+            this.currentSecond = date.getSeconds();
+        }
+
+        if (this.maxDate && this.maxDate < date) {
+            date = this.maxDate;
+            this.setCurrentHourPM(date.getHours());
+            this.currentMinute = date.getMinutes();
+            this.currentSecond = date.getSeconds();
+        }
+
+        if (this.isSingleSelection()) {
+            this.updateModel(date);
+        }
+        else if (this.isMultipleSelection()) {
+            this.updateModel(this.value ? [...this.value, date] : [date]);
+        }
+        else if (this.isRangeSelection()) {
+            if (this.value && this.value.length) {
+                let startDate = this.value[0];
+                let endDate = this.value[1];
+
+                if (!endDate && date.getTime() >= startDate.getTime()) {
+                    endDate = date;
+                }
+                else {
+                    startDate = date;
+                    endDate = null;
+                }
+
+                this.updateModel([startDate, endDate]);
+            }
+            else {
+                this.updateModel([date, null]);
+            }
+        }
+
+        this.onSelect.emit(date);
     }
 }
 

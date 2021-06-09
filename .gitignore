@@ -20,12 +20,18 @@
 .settings/
 *.sublime-workspace
 
+# Visual Studio cache/options directory
+.vs/
+
 # IDE - VSCode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# Visual Studio 2015 cache/options directory
+.vs/
 
 # misc
 /.sass-cache

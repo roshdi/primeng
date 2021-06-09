@@ -1,13 +1,13 @@
-import {NgModule} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {FormsModule} from '@angular/forms';
-import {MultiCalendarDemo} from './multicalendardemo';
-import {MultiCalendarDemoRoutingModule} from './multicalendardemo-routing.module';
-import {MultiCalendarModule} from 'primeng/multicalendar';
-import {TabViewModule} from 'primeng/tabview';
-import {AppCodeModule} from '../../app.code.component';
-import {AppDemoActionsModule} from '../../app.demoactions.component';
-import { CalendarModule } from '../../../components/calendar/calendar';
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms'
+import { MultiCalendarDemo } from './multicalendardemo';
+import { MultiCalendarDemoRoutingModule } from './multicalendardemo-routing.module';
+import { MultiCalendarModule } from 'primeng/multicalendar';
+import { CalendarModule } from 'primeng/calendar';
+import { TabViewModule } from 'primeng/tabview';
+import { AppCodeModule } from '../../app.code.component';
+import { AppDemoActionsModule } from '../../app.demoactions.component';
 
 @NgModule({
 	imports: [
@@ -24,4 +24,4 @@ import { CalendarModule } from '../../../components/calendar/calendar';
 		MultiCalendarDemo
 	]
 })
-export class MultiCalendarDemoModule {}
+export class MultiCalendarDemoModule { }

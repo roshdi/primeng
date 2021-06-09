@@ -29,12 +29,37 @@ export interface Translation {
     choose?: string;
     upload?: string;
     cancel?: string;
+
     dayNames?: string[];
+    dayNames_jalali?: string[];
+    dayNames_fa?: string[];
+    dayNames_jalali_fa?: string[];
+
     dayNamesShort?: string[];
+    dayNamesShort_jalali?: string[];
+    dayNamesShort_fa?: string[];
+    dayNamesShort_jalali_fa?: string[];
+
     dayNamesMin?: string[];
+    dayNamesMin_jalali?: string[];
+    dayNamesMin_fa?: string[];
+    dayNamesMin_jalali_fa?: string[];
+
     monthNames?: string[];
+    monthNames_jalali?: string[];
+    monthNames_fa?: string[];
+    monthNames_jalali_fa?: string[];
+
     monthNamesShort?: string[];
+    monthNamesShort_jalali?: string[];
+    monthNamesShort_fa?: string[];
+    monthNamesShort_jalali_fa?: string[];
+
     today?: string;
+    today_jalali?: string;
+    today_fa?: string;
+    today_jalali_fa?: string;
+
     weekHeader?: string;
     weak?: string;
     medium?: string;
