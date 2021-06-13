@@ -18,6 +18,11 @@
     border-radius: 0;
 }
 
+.p-calendar-w-btn button.p-datepickercalendar-trigger {
+    border-start-end-radius: 2px;
+    border-end-end-radius: 2px;
+}
+
 /* Fluid */
 .p-fluid .p-calendar {
     display: flex;

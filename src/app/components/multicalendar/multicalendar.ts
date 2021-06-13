@@ -224,9 +224,22 @@ export class MultiCalendar extends Calendar {
 
         this.calendarSelectIconMenuItems = [{
             label: 'Jalali',
+            command: () => {
+                if(this.calendarType !== CalendarType.Jalali){
+                    this.calendarType = CalendarType.Jalali;
+                    this.updateUI();
+                }
+            }
         },
         {
             label: 'Gregorian',
+            command: () => {
+                if(this.calendarType !== CalendarType.Gregorian)
+                {
+                    this.calendarType = CalendarType.Gregorian;
+                    this.updateUI();
+                }
+            }
         }];
     }
 
