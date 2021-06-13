@@ -43,13 +43,13 @@ export interface LocaleSettings {
         <span #container [ngClass]="{'p-calendar':true, 'p-calendar-rtl':rtl, 'p-calendar-w-btn': showIcon, 'p-calendar-timeonly': timeOnly, 'p-calendar-disabled':disabled, 'p-focus': focus}" [ngStyle]="style" [class]="styleClass">
             <ng-template [ngIf]="!inline">
                 <input #inputfield type="text" [attr.id]="inputId" [attr.name]="name" [attr.required]="required" [attr.aria-required]="required" [value]="inputFieldValue" (focus)="onInputFocus($event)" (keydown)="onInputKeydown($event)" (click)="onInputClick()" (blur)="onInputBlur($event)"
-                    [readonly]="readonlyInput" (input)="onUserInput($event)" [ngStyle]="inputStyle" [class]="inputStyleClass" [placeholder]="placeholder||''" [disabled]="disabled" [attr.tabindex]="tabindex" [attr.inputmode]="touchUI ? 'off' : null"
-                    [ngClass]="'p-inputtext p-component'" autocomplete="off" [attr.aria-labelledby]="ariaLabelledBy">
-                    <button type="button" [icon]="icon" pButton pRipple *ngIf="showIcon" (click)="onButtonClick($event,inputfield)"
-                    class="p-datepicker-trigger" [disabled]="disabled" tabindex="0"></button>
-                    <button type="button" [icon]="calendarSelectIcon" pButton pRipple *ngIf="showCalendarSelectIcon"
-                    (click)="calendarSelectionMenu.toggle($event)" class="p-datepickercalendar-trigger" [disabled]="disabled" tabindex="0"></button>
-                    <p-menu #calendarSelectionMenu [popup]="true" [model]="calendarSelectIconMenuItems"></p-menu>
+                [readonly]="readonlyInput" (input)="onUserInput($event)" [ngStyle]="inputStyle" [class]="inputStyleClass" [placeholder]="placeholder||''" [disabled]="disabled" [attr.tabindex]="tabindex" [attr.inputmode]="touchUI ? 'off' : null"
+                [ngClass]="'p-inputtext p-component'" autocomplete="off" [attr.aria-labelledby]="ariaLabelledBy">
+                <button type="button" [icon]="icon" pButton pRipple *ngIf="showIcon" (click)="onButtonClick($event,inputfield)"
+                class="p-datepicker-trigger" [disabled]="disabled" tabindex="0"></button>
+                <button type="button" [icon]="calendarSelectIcon" pButton pRipple *ngIf="showCalendarSelectIcon"
+                (click)="calendarSelectionMenu.toggle($event)" class="p-datepickercalendar-trigger" [disabled]="disabled" tabindex="0"></button>
+                <p-menu #calendarSelectionMenu class='calendarSelectItems' [popup]="true" [model]="calendarSelectIconMenuItems"></p-menu>
             </ng-template>
             <div #contentWrapper [class]="panelStyleClass" [ngStyle]="panelStyle" [ngClass]="{'p-datepicker p-component': true, 'p-datepicker-inline':inline,
                 'p-disabled':disabled,'p-datepicker-timeonly':timeOnly,'p-datepicker-multiple-month': this.numberOfMonths > 1, 'p-datepicker-monthpicker': (view === 'month'), 'p-datepicker-touch-ui': touchUI}"

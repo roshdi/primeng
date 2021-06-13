@@ -13,9 +13,9 @@
     border-bottom-right-radius: 0;
 }
 
-.p-calendar-w-btn .p-datepicker-trigger {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
+.p-calendar-w-btn button {
+    border-radius: 0;
+    border-radius: 0;
 }
 
 /* Fluid */
@@ -131,4 +131,12 @@
     left: 50%;
     min-width: 80vw;
     transform: translate(-50%, -50%);
+}
+
+p-menu.calendarSelectItems  > div
+{
+    position: absolute;
+    top: 35px !important;
+    left: 0 !important;
+    width: 100% !important;
 }
