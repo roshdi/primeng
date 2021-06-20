@@ -285,6 +285,10 @@ p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
   border-color: #f44435;
 }
 
+.p-calendar-rtl table *,.p-calendar-rtl .p-datepicker-header select {
+  font-family: "iran-sans";
+}
+
 .p-datepicker {
   padding: 0.5rem;
   background: #1e1e1e;

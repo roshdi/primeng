@@ -50,6 +50,7 @@
   src: local("Roboto Bold"), local("Roboto-Bold"), url("./fonts/roboto-v20-latin-ext_latin-700.woff2") format("woff2"), url("./fonts/roboto-v20-latin-ext_latin-700.woff") format("woff");
   /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
+
 * {
   box-sizing: border-box;
 }
@@ -283,6 +284,10 @@ p-autocomplete.ng-dirty.ng-invalid > .p-autocomplete > .p-inputtext {
 
 p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
   border-color: #f44435;
+}
+
+.p-calendar-rtl table *,.p-calendar-rtl .p-datepicker-header select {
+  font-family: "iran-sans";
 }
 
 .p-datepicker {

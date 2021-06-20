@@ -48,7 +48,7 @@ export interface LocaleSettings {
                 <button type="button" [icon]="icon" pButton pRipple *ngIf="showIcon" (click)="onButtonClick($event,inputfield)"
                 class="p-datepicker-trigger" [disabled]="disabled" tabindex="0"></button>
                 <button type="button" [icon]="calendarSelectIcon" pButton pRipple *ngIf="showCalendarSelectIcon"
-                (click)="calendarSelectionMenu.toggle($event)" class="p-datepickercalendar-trigger" [disabled]="disabled" tabindex="0"></button>
+                (click)="onCalendarSelectIconMenuClick($event, calendarSelectionMenu)" class="p-datepickercalendar-trigger" [disabled]="disabled" tabindex="0"></button>
                 <p-menu #calendarSelectionMenu class='calendarSelectItems' [popup]="true" [model]="calendarSelectIconMenuItems"></p-menu>
             </ng-template>
             <div #contentWrapper [class]="panelStyleClass" [ngStyle]="panelStyle" [ngClass]="{'p-datepicker p-component': true, 'p-datepicker-inline':inline,
@@ -228,6 +228,7 @@ export class MultiCalendar extends Calendar {
                 if(this.calendarType !== CalendarType.Jalali){
                     this.calendarType = CalendarType.Jalali;
                     this.updateUI();
+                    this.updateInputfield();
                 }
             }
         },
@@ -238,9 +239,17 @@ export class MultiCalendar extends Calendar {
                 {
                     this.calendarType = CalendarType.Gregorian;
                     this.updateUI();
+                    this.updateInputfield();
                 }
             }
         }];
+    }
+
+    onCalendarSelectIconMenuClick(event, calendarSelectionMenu) {
+        if (this.overlayVisible) {
+            this.hideOverlay();
+        }
+        calendarSelectionMenu.toggle(event);
     }
 
     _calendarType: CalendarType = CalendarType.Jalali;
