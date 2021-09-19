@@ -12,6 +12,8 @@ export class TableScrollDemo implements OnInit {
 
     dialogVisible: boolean;
 
+    rtlDialogVisible :boolean;
+
     scrollableCols: any[];
 
     unlockedCustomers: any[];
@@ -94,5 +96,9 @@ export class TableScrollDemo implements OnInit {
 
     formatCurrency(value) {
         return value.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
+    }
+
+    showDialogRTL() {
+        this.rtlDialogVisible = true;
     }
 }

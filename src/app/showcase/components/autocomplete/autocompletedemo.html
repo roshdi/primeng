@@ -41,6 +41,43 @@
             </p-autoComplete>
         </span>
     </div>
+
+
+    <div class="card" dir="rtl">
+        <h5>RTL Basick</h5>
+        <p-autoComplete [rtl]="true" [(ngModel)]="selectedCountry" [showEmptyMessage]="true" [suggestions]="filteredCountries" (completeMethod)="filterCountry($event)" field="name" [minLength]="1"></p-autoComplete>
+    
+        <h5>Dropdown and Templating</h5>
+        <p-autoComplete [rtl]="true" [(ngModel)]="selectedCountryAdvanced" [suggestions]="filteredCountries" (completeMethod)="filterCountry($event)" field="name" [dropdown]="true">
+            <ng-template let-country pTemplate="item">
+                <div class="country-item">
+                    <img src="assets/showcase/images/demo/flag/flag_placeholder.png" [class]="'flag flag-' + country.code.toLowerCase()" />
+                    <div>{{country.name}}</div>
+                </div>
+            </ng-template>
+        </p-autoComplete>
+    
+        <h5>Grouped</h5>
+        <p-autoComplete [rtl]="true" [group]="true" [suggestions]="filteredGroups" (completeMethod)="filterGroupedCity($event)" field="label" [multiple]="true" [dropdown]="true">
+            <ng-template let-group pTemplate="group">
+                <div class="p-d-flex p-ai-center">
+                    <img src="assets/showcase/images/demo/flag/flag_placeholder.png" [class]="'p-mr-2 flag flag-' + group.value" style="width: 20px"/>
+                    <span>{{group.label}}</span>
+                </div>
+            </ng-template>
+        </p-autoComplete>
+
+        <h5>Virtual Scroll (10000 Items)</h5>
+        <p-autoComplete [rtl]="true" [(ngModel)]="selectedItem" [virtualScroll]="true" [suggestions]="filteredItems" [itemSize]="34" (completeMethod)="filterItems($event)" field="label" [dropdown]="true">
+        </p-autoComplete>
+
+        <h5>Multiple</h5>
+        <span class="p-fluid">
+            <p-autoComplete [rtl]="true" [(ngModel)]="selectedCountries" [suggestions]="filteredCountries" (completeMethod)="filterCountry($event)" field="name" [multiple]="true">
+            </p-autoComplete>
+        </span>
+    </div>
+
 </div>
 
 <div class="content-section documentation">

@@ -1,13 +1,15 @@
-import {NgModule,Component,Input, Output, EventEmitter,ChangeDetectionStrategy, ViewEncapsulation} from '@angular/core';
+import {NgModule,Component,Input, Output, EventEmitter,ChangeDetectionStrategy, ViewEncapsulation, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MenuItem} from 'primeng/api';
 import {RouterModule} from '@angular/router';
 import {TooltipModule} from 'primeng/tooltip';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import { Directionality } from '@angular/cdk/bidi';
 
 @Component({
     selector: 'p-breadcrumb',
     template: `
-        <div [class]="styleClass" [ngStyle]="style" [ngClass]="'p-breadcrumb p-component'">
+        <div [class]="styleClass" [ngStyle]="style" [ngClass]="{'p-breadcrumb p-component':true,'p-component-rtl' : rtl}">
             <ul>
                 <li [class]="home.styleClass" [ngClass]="{'p-breadcrumb-home': true, 'p-disabled':home.disabled}" [ngStyle]="home.style" *ngIf="home" pTooltip [tooltipOptions]="home.tooltipOptions">
                     <a *ngIf="!home.routerLink" [href]="home.url ? home.url : null" class="p-menuitem-link" (click)="itemClick($event, home)"
@@ -28,7 +30,7 @@ import {TooltipModule} from 'primeng/tooltip';
                         </ng-container>
                     </a>
                 </li>
-                <li class="p-breadcrumb-chevron pi pi-chevron-right" *ngIf="model&&home"></li>
+                <li [ngClass]="{'p-breadcrumb-chevron pi':true, 'pi-chevron-right':!rtl, 'pi-chevron-left':rtl}" *ngIf="model&&home"></li>
                 <ng-template ngFor let-item let-end="last" [ngForOf]="model">
                     <li [class]="item.styleClass" [ngStyle]="item.style" [ngClass]="{'p-disabled':item.disabled}">
                         <a *ngIf="!item.routerLink" [attr.href]="item.url ? item.url : null" class="p-menuitem-link" (click)="itemClick($event, item)" pTooltip [tooltipOptions]="item.tooltipOptions"
@@ -49,7 +51,7 @@ import {TooltipModule} from 'primeng/tooltip';
                             </ng-container>
                         </a>
                     </li>
-                    <li class="p-breadcrumb-chevron pi pi-chevron-right" *ngIf="!end"></li>
+                    <li [ngClass]="{'p-breadcrumb-chevron pi':true, 'pi-chevron-right':!rtl, 'pi-chevron-left':rtl}" *ngIf="!end"></li>
                 </ng-template>
             </ul>
         </div>
@@ -61,7 +63,7 @@ import {TooltipModule} from 'primeng/tooltip';
         'class': 'p-element'
     }
 })
-export class Breadcrumb {
+export class Breadcrumb implements OnInit {
 
     @Input() model: MenuItem[];
 
@@ -71,8 +73,17 @@ export class Breadcrumb {
 
     @Input() home: MenuItem;
 
+    @Input() rtl : boolean = undefined;
+
     @Output() onItemClick: EventEmitter<any> = new EventEmitter();
 
+    constructor(private dir: Directionality) {}
+
+    ngOnInit() {
+        if (this.rtl == undefined)
+            this.rtl = this.dir.value === 'rtl';
+    }
+        
     itemClick(event, item: MenuItem) {
         if (item.disabled) {
             event.preventDefault();
@@ -105,7 +116,7 @@ export class Breadcrumb {
 
 @NgModule({
     imports: [CommonModule,RouterModule,TooltipModule],
-    exports: [Breadcrumb,RouterModule,TooltipModule],
+    exports: [Breadcrumb, RouterModule, TooltipModule, ScrollingModule],
     declarations: [Breadcrumb]
 })
 export class BreadcrumbModule { }

@@ -15,7 +15,13 @@
 }
 
 .p-autocomplete-dd .p-autocomplete-input,
-.p-autocomplete-dd .p-autocomplete-multiple-container {
+.p-autocomplete-dd .p-autocomplete-multiple-container-ltr {
+     border-top-right-radius: 0;
+     border-bottom-right-radius: 0;
+ }
+
+ .p-autocomplete-dd .p-autocomplete-input,
+.p-autocomplete-dd .p-autocomplete-multiple-container-rtl {
      border-top-right-radius: 0;
      border-bottom-right-radius: 0;
  }
@@ -23,6 +29,11 @@
 .p-autocomplete-dd .p-autocomplete-dropdown {
      border-top-left-radius: 0;
      border-bottom-left-radius: 0px;
+}
+
+.p-autocomplete-dd .p-autocomplete-dropdown-rtl {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0px;
 }
 
 .p-autocomplete .p-autocomplete-panel {

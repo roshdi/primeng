@@ -82,7 +82,7 @@
                 }
 
                 .p-tag {
-                    padding-top:.125rem;
+                    padding-top: .125rem;
                     padding-bottom: .125rem;
                     margin-left: .5rem;
                     line-height: 1.5;
@@ -136,5 +136,27 @@
         padding: 1.25rem 1rem;
         border-bottom: 1px solid var(--surface-d);
         background-color: var(--surface-a);
+    }
+}
+
+.p-component-rtl {
+    .layout-sidebar {
+        right: 0;
+        left: auto;
+    }
+}
+
+
+.ui-rtl .layout-sidebar {
+    position: fixed;
+    left: auto;
+    right: 0;
+    border-left: 1px solid var(--surface-d);
+
+    .layout-menu {
+        padding: 0 1rem;
+        overflow-y: auto;
+        flex-grow: 1;
+        border-left: 1px solid var(--surface-d);
     }
 }

@@ -1,4 +1,4 @@
-import {NgModule,Component,ElementRef,OnDestroy,Input,Output,EventEmitter,Renderer2,ViewChild,Inject,forwardRef,ChangeDetectorRef,ChangeDetectionStrategy, ViewEncapsulation} from '@angular/core';
+import {NgModule,Component,ElementRef,OnDestroy,Input,Output,EventEmitter,Renderer2,ViewChild,Inject,forwardRef,ChangeDetectorRef,ChangeDetectionStrategy, ViewEncapsulation, OnInit} from '@angular/core';
 import {trigger,state,style,transition,animate,AnimationEvent} from '@angular/animations';
 import {CommonModule} from '@angular/common';
 import {DomHandler, ConnectedOverlayScrollHandler} from 'primeng/dom';
@@ -7,6 +7,8 @@ import {ZIndexUtils} from 'primeng/utils';
 import {RouterModule} from '@angular/router';
 import {RippleModule} from 'primeng/ripple';
 import {TooltipModule} from 'primeng/tooltip';
+import { Directionality } from '@angular/cdk/bidi';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 @Component({
     selector: '[pMenuItemContent]',
@@ -45,7 +47,7 @@ export class MenuItemContent {
 @Component({
     selector: 'p-menu',
     template: `
-        <div #container [ngClass]="{'p-menu p-component': true, 'p-menu-overlay': popup}"
+        <div #container [ngClass]="{'p-menu p-component': true, 'p-menu-overlay': popup, 'p-component-rtl' : rtl,}"
             [class]="styleClass" [ngStyle]="style" *ngIf="!popup || visible" (click)="onOverlayClick($event)"
             [@overlayAnimation]="{value: 'visible', params: {showTransitionParams: showTransitionOptions, hideTransitionParams: hideTransitionOptions}}" [@.disabled]="popup !== true" (@overlayAnimation.start)="onOverlayAnimationStart($event)" (@overlayAnimation.done)="onOverlayAnimationEnd($event)">
             <ul class="p-menu-list p-reset">
@@ -85,7 +87,7 @@ export class MenuItemContent {
         'class': 'p-element'
     }
 })
-export class Menu implements OnDestroy {
+export class Menu implements OnInit, OnDestroy {
 
     @Input() model: MenuItem[];
 
@@ -104,6 +106,8 @@ export class Menu implements OnDestroy {
     @Input() showTransitionOptions: string = '.12s cubic-bezier(0, 0, 0.2, 1)';
 
     @Input() hideTransitionOptions: string = '.1s linear';
+
+    @Input() rtl : boolean = undefined;
 
     @ViewChild('container') containerViewChild: ElementRef;
 
@@ -127,7 +131,13 @@ export class Menu implements OnDestroy {
 
     relativeAlign: boolean;
 
-    constructor(public el: ElementRef, public renderer: Renderer2, private cd: ChangeDetectorRef, public config: PrimeNGConfig, public overlayService: OverlayService) {}
+    constructor(public el: ElementRef, public renderer: Renderer2, private cd: ChangeDetectorRef, public config: PrimeNGConfig, public overlayService: OverlayService,private dir: Directionality) {}
+
+    ngOnInit() {
+
+        if (this.rtl == undefined)
+            this.rtl = this.dir.value === 'rtl';
+    }
 
     toggle(event) {
         if (this.visible)
@@ -338,7 +348,7 @@ export class Menu implements OnDestroy {
 
 @NgModule({
     imports: [CommonModule,RouterModule,RippleModule,TooltipModule],
-    exports: [Menu,RouterModule,TooltipModule],
+    exports: [Menu,RouterModule,TooltipModule,ScrollingModule],
     declarations: [Menu,MenuItemContent]
 })
 export class MenuModule { }
