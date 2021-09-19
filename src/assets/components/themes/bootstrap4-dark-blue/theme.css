@@ -43,6 +43,12 @@
   --surface-hover:rgba(255,255,255,.04);
 }
 
+/* IRANSansWeb(FaNum)_Light*/
+@font-face {font-family: "iran-sans";
+  src: url("./fonts/IRANSansWeb_FaNum_Light.woff2") format("woff2"), /* chrome firefox */
+  url("./fonts/IRANSansWeb_FaNum_Light.woff") format("woff"); /* chrome firefox */
+}
+
 * {
   box-sizing: border-box;
 }
@@ -276,6 +282,10 @@ p-autocomplete.ng-dirty.ng-invalid > .p-autocomplete > .p-inputtext {
 
 p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
   border-color: #f19ea6;
+}
+
+.p-calendar-rtl table *,.p-calendar-rtl .p-datepicker-header select {
+  font-family: "iran-sans";
 }
 
 .p-datepicker {
