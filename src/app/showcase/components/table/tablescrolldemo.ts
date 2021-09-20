@@ -15,6 +15,10 @@ export class TableScrollDemo implements OnInit {
     rtlDialogVisible :boolean;
 
     scrollableCols: any[];
+    	
+    frozenCols: any[];
+    
+    frozenValue: Customer[];
 
     unlockedCustomers: any[];
 
@@ -33,6 +37,22 @@ export class TableScrollDemo implements OnInit {
         this.customerService.getCustomersMedium().then(data => this.unlockedCustomers = data);
 
         this.lockedCustomers = [
+            {	
+                id: 1255,	
+                name: "James McAdams",	
+                country: {	
+                    name: "United States",	
+                    code: "us"	
+                },	
+                company: "McAdams Consulting Ltd",	
+                date: "2014-02-13",	
+                status: "qualified",	
+                activity: 23,	
+                representative: {	
+                    name: "Ioni Bowcher",	
+                    image: "ionibowcher.png"	
+                }	
+            },
             {
                 id: 5135,
                 name: "Geraldine Bisset",
@@ -49,6 +69,10 @@ export class TableScrollDemo implements OnInit {
                     image: "amyelsner.png"
                 }
             }
+        ];
+        
+        this.frozenCols = [	
+            { field: 'name', header: 'Name' }	
         ];
 
         this.scrollableCols = [
