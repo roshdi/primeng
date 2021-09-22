@@ -10,7 +10,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "build-lib": "ng build primeng-library && gulp build-assets"
+    "build-lib": "ng build primeng-library && gulp build-assets",
+    "publish": "cd dist && npm publish --registry http://localhost:4873/ && cd .."
   },
   "repository": {
     "type": "git",
