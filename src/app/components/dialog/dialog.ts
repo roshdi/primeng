@@ -21,7 +21,7 @@ const hideAnimation = animation([
     selector: 'p-dialog',
     template: `
         <div *ngIf="maskVisible" [class]="maskStyleClass"
-            [ngClass]="{'p-dialog-mask': true, 'p-component-overlay': this.modal, 'p-dialog-mask-scrollblocker': this.modal || this.blockScroll,
+            [ngClass]="{'p-dialog-mask': true, 'p-component-overlay p-component-overlay-enter': this.modal, 'p-dialog-mask-scrollblocker': this.modal || this.blockScroll,
                 'p-dialog-left': position === 'left',
                 'p-dialog-right': position === 'right',
                 'p-dialog-top': position === 'top',
@@ -43,7 +43,7 @@ const hideAnimation = animation([
                         <button *ngIf="maximizable" type="button" [ngClass]="{'p-dialog-header-icon p-dialog-header-maximize p-link':true}" (click)="maximize()" (keydown.enter)="maximize()" tabindex="-1" pRipple>
                             <span class="p-dialog-header-maximize-icon" [ngClass]="maximized ? minimizeIcon : maximizeIcon"></span>
                         </button>
-                        <button *ngIf="closable" type="button" [ngClass]="{'p-dialog-header-icon p-dialog-header-close p-link':true}" [attr.aria-label]="closeAriaLabel" (click)="close($event)" (keydown.enter)="close($event)" tabindex="-1" pRipple>
+                        <button *ngIf="closable" type="button" [ngClass]="{'p-dialog-header-icon p-dialog-header-close p-link':true}" [attr.aria-label]="closeAriaLabel" (click)="close($event)" (keydown.enter)="close($event)" [attr.tabindex]="closeTabindex" pRipple>
                             <span class="p-dialog-header-close-icon" [ngClass]="closeIcon"></span>
                         </button>
                     </div>
@@ -164,6 +164,8 @@ export class Dialog implements AfterContentInit,OnInit,OnDestroy {
     @Input() closeIcon: string = 'pi pi-times';
 
     @Input() closeAriaLabel: string;
+
+    @Input() closeTabindex: string = "-1";
 
     @Input() minimizeIcon: string = 'pi pi-window-minimize';
 
@@ -480,7 +482,7 @@ export class Dialog implements AfterContentInit,OnInit,OnDestroy {
             let containerHeight = DomHandler.getOuterHeight(this.container);
             let deltaX = event.pageX - this.lastPageX;
             let deltaY = event.pageY - this.lastPageY;
-            let offset = DomHandler.getOffset(this.container);
+            let offset = this.container.getBoundingClientRect();
             let leftPos = offset.left + deltaX;
             let topPos = offset.top + deltaY;
             let viewport = DomHandler.getViewport();
@@ -551,7 +553,7 @@ export class Dialog implements AfterContentInit,OnInit,OnDestroy {
             let newHeight = containerHeight + deltaY;
             let minWidth = this.container.style.minWidth;
             let minHeight = this.container.style.minHeight;
-            let offset = DomHandler.getOffset(this.container);
+            let offset = this.container.getBoundingClientRect();
             let viewport = DomHandler.getViewport();
             let hasBeenDragged = !parseInt(this.container.style.top) || !parseInt(this.container.style.left);
 
@@ -707,6 +709,12 @@ export class Dialog implements AfterContentInit,OnInit,OnDestroy {
 
                 if (this.focusOnShow) {
                     this.focus();
+                }
+            break;
+
+            case 'void':
+                if (this.wrapper && this.modal) {
+                    DomHandler.addClass(this.wrapper, 'p-component-overlay-leave');
                 }
             break;
         }

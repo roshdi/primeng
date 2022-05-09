@@ -21,10 +21,12 @@ export const AUTOCOMPLETE_VALUE_ACCESSOR: any = {
     template: `
         <span #container [ngClass]="{'p-autocomplete p-component':true,'p-autocomplete-dd':dropdown,'p-autocomplete-multiple':multiple}" [ngStyle]="style" [class]="styleClass">
             <input *ngIf="!multiple" #in [attr.type]="type" [attr.id]="inputId" [ngStyle]="inputStyle" [class]="inputStyleClass" [autocomplete]="autocomplete" [attr.required]="required" [attr.name]="name"
-            class="p-autocomplete-input p-inputtext p-component" [ngClass]="{'p-autocomplete-dd-input':dropdown,'p-disabled': disabled}" [value]="inputFieldValue" aria-autocomplete="list" [attr.aria-controls]="listId" role="searchbox" [attr.aria-expanded]="overlayVisible" aria-haspopup="true" [attr.aria-activedescendant]="'p-highlighted-option'"
+            class="p-autocomplete-input p-inputtext p-component" [ngClass]="{'p-autocomplete-dd-input':dropdown,'p-disabled': disabled}" [value]="inputFieldValue" aria-autocomplete="list" role="searchbox"
             (click)="onInputClick($event)" (input)="onInput($event)" (keydown)="onKeydown($event)" (keyup)="onKeyup($event)" [attr.autofocus]="autofocus" (focus)="onInputFocus($event)" (blur)="onInputBlur($event)" (change)="onInputChange($event)" (paste)="onInputPaste($event)"
-            [attr.placeholder]="placeholder" [attr.size]="size" [attr.maxlength]="maxlength" [attr.tabindex]="tabindex" [readonly]="readonly" [disabled]="disabled" [attr.aria-label]="ariaLabel" [attr.aria-labelledby]="ariaLabelledBy" [attr.aria-required]="required"
-            ><ul *ngIf="multiple" #multiContainer class="p-autocomplete-multiple-container p-component p-inputtext" [ngClass]="{'p-disabled':disabled,'p-focus':focus}" (click)="multiIn.focus()">
+            [attr.placeholder]="placeholder" [attr.size]="size" [attr.maxlength]="maxlength" [attr.tabindex]="tabindex" [readonly]="readonly" [disabled]="disabled" [attr.aria-label]="ariaLabel" [attr.aria-labelledby]="ariaLabelledBy" [attr.aria-required]="required">
+            <i *ngIf="!multiple && inputValue && filled && !disabled && showClear" class="p-autocomplete-clear-icon pi pi-times" (click)="clear()"></i>
+            <i *ngIf="multiple && value && filled && !disabled && showClear" class="p-autocomplete-clear-icon pi pi-times" (click)="clear()"></i>
+            <ul *ngIf="multiple" #multiContainer class="p-autocomplete-multiple-container p-component p-inputtext" [ngClass]="{'p-disabled':disabled,'p-focus':focus}" (click)="multiIn.focus()">
                 <li #token *ngFor="let val of value" class="p-autocomplete-token">
                     <ng-container *ngTemplateOutlet="selectedItemTemplate; context: {$implicit: val}"></ng-container>
                     <span *ngIf="!selectedItemTemplate" class="p-autocomplete-token-label">{{resolveFieldData(val)}}</span>
@@ -37,7 +39,7 @@ export const AUTOCOMPLETE_VALUE_ACCESSOR: any = {
                             aria-autocomplete="list" [attr.aria-controls]="listId" role="searchbox" [attr.aria-expanded]="overlayVisible" aria-haspopup="true" [attr.aria-activedescendant]="'p-highlighted-option'">
                 </li>
             </ul>
-            <i *ngIf="loading" class="p-autocomplete-loader pi pi-spinner pi-spin"></i><button #ddBtn type="button" pButton [icon]="dropdownIcon" class="p-autocomplete-dropdown" [disabled]="disabled" pRipple
+            <i *ngIf="loading" class="p-autocomplete-loader pi pi-spinner pi-spin"></i><button #ddBtn type="button" pButton [icon]="dropdownIcon" [attr.aria-label]="dropdownAriaLabel" class="p-autocomplete-dropdown" [disabled]="disabled" pRipple
                 (click)="handleDropdownClick($event)" *ngIf="dropdown" [attr.tabindex]="tabindex"></button>
             <div #panel *ngIf="overlayVisible" (click)="onOverlayClick($event)" [ngClass]="['p-autocomplete-panel p-component']" [style.max-height]="virtualScroll ? 'auto' : scrollHeight" [ngStyle]="panelStyle" [class]="panelStyleClass"
                 [@overlayAnimation]="{value: 'visible', params: {showTransitionParams: showTransitionOptions, hideTransitionParams: hideTransitionOptions}}" (@overlayAnimation.start)="onOverlayAnimationStart($event)" (@overlayAnimation.done)="onOverlayAnimationEnd($event)">
@@ -98,7 +100,9 @@ export const AUTOCOMPLETE_VALUE_ACCESSOR: any = {
     host: {
         'class': 'p-element p-inputwrapper',
         '[class.p-inputwrapper-filled]': 'filled',
-        '[class.p-inputwrapper-focus]': '(focus && !disabled) || overlayVisible'
+        '[class.p-inputwrapper-focus]': '(focus && !disabled) || overlayVisible',
+        '[class.p-autocomplete-clearable]': 'showClear && !disabled',
+        '[class.p-autocomplete-dropdown]': 'dropdown',
     },
     providers: [AUTOCOMPLETE_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -157,6 +161,8 @@ export class AutoComplete implements AfterViewChecked,AfterContentInit,OnDestroy
 
     @Input() ariaLabel: string;
 
+    @Input() dropdownAriaLabel: string;
+
     @Input() ariaLabelledBy: string;
 
     @Input() dropdownIcon: string = "pi pi-chevron-down";
@@ -166,6 +172,8 @@ export class AutoComplete implements AfterViewChecked,AfterContentInit,OnDestroy
     @Input() group: boolean;
 
     @Input() completeOnFocus: boolean = false;
+
+    @Input() showClear: boolean = true;
 
     @Output() completeMethod: EventEmitter<any> = new EventEmitter();
 
@@ -294,6 +302,8 @@ export class AutoComplete implements AfterViewChecked,AfterContentInit,OnDestroy
     itemClicked: boolean;
 
     virtualScrollSelectedIndex: number;
+
+    inputValue: string = null;
 
     constructor(public el: ElementRef, public renderer: Renderer2, public cd: ChangeDetectorRef, public differs: IterableDiffers, public config: PrimeNGConfig, public overlayService: OverlayService) {
         this.differ = differs.find([]).create(null);
@@ -450,6 +460,7 @@ export class AutoComplete implements AfterViewChecked,AfterContentInit,OnDestroy
         }
 
         let value = (<HTMLInputElement> event.target).value;
+        this.inputValue = value;
         if (!this.multiple && !this.forceSelection) {
             this.onModelChange(value);
         }
@@ -531,6 +542,18 @@ export class AutoComplete implements AfterViewChecked,AfterContentInit,OnDestroy
                 this.overlayVisible = true;
             }
         }
+    }
+
+    clear() {
+        if(this.multiple) {
+            this.value = null;
+
+        } else {
+            this.inputValue = null;
+            this.inputEL.nativeElement.value = '';
+        }
+        this.onModelChange(this.value);
+        this.onClear.emit();
     }
 
     onOverlayAnimationStart(event: AnimationEvent) {
@@ -750,6 +773,14 @@ export class AutoComplete implements AfterViewChecked,AfterContentInit,OnDestroy
         } else {
             if (event.which === 40 && this.suggestions) {
                 this.search(event,event.target.value);
+            } else if((event.ctrlKey && event.key === 'z') && !this.multiple) {
+                this.inputEL.nativeElement.value =  this.resolveFieldData(null);
+                this.value = '';
+                this.onModelChange(this.value);
+            } else if ((event.ctrlKey && event.key === 'z') && this.multiple) {
+                this.value.pop();
+                this.onModelChange(this.value);
+                this.updateFilledState();
             }
         }
 

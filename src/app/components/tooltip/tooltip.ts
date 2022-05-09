@@ -70,7 +70,7 @@ export class Tooltip implements AfterViewInit, OnDestroy {
         tooltipEvent: 'hover',
         appendTo: 'body',
         tooltipZIndex: 'auto',
-        escape: false,
+        escape: true,
         positionTop: 0,
         positionLeft: 0
     }
@@ -158,7 +158,7 @@ export class Tooltip implements AfterViewInit, OnDestroy {
         }
 
         if (simpleChange.hideDelay) {
-            this.setOption({showDelay: simpleChange.hideDelay.currentValue});
+            this.setOption({hideDelay: simpleChange.hideDelay.currentValue});
         }
 
         if (simpleChange.life) {

@@ -25,7 +25,7 @@ import {RippleModule} from 'primeng/ripple';
                     [draggable]="tree.draggableNodes" (dragstart)="onDragStart($event)" (dragend)="onDragStop($event)" [attr.tabindex]="0"
                     [ngClass]="{'p-treenode-selectable':tree.selectionMode && node.selectable !== false,'p-treenode-dragover':draghoverNode, 'p-highlight':isSelected()}" role="treeitem"
                     (keydown)="onKeyDown($event)" [attr.aria-posinset]="this.index + 1" [attr.aria-expanded]="this.node.expanded" [attr.aria-selected]="isSelected()" [attr.aria-label]="node.label">
-                    <button type="button" class="p-tree-toggler p-link" (click)="toggle($event)" pRipple tabindex="-1">
+                    <button type="button" [attr.aria-label]="tree.togglerAriaLabel" class="p-tree-toggler p-link" (click)="toggle($event)" pRipple tabindex="-1">
                         <span class="p-tree-toggler-icon pi pi-fw" [ngClass]="{'pi-chevron-right':!node.expanded,'pi-chevron-down':node.expanded}"></span>
                     </button>
                     <div class="p-checkbox p-component" [ngClass]="{'p-checkbox-disabled': node.selectable === false}" *ngIf="tree.selectionMode == 'checkbox'" [attr.aria-checked]="isSelected()">
@@ -66,7 +66,7 @@ import {RippleModule} from 'primeng/ripple';
                         <td class="p-treenode" [ngClass]="{'p-treenode-collapsed':!node.expanded}">
                             <div class="p-treenode-content" tabindex="0" [ngClass]="{'p-treenode-selectable':tree.selectionMode,'p-highlight':isSelected()}" (click)="onNodeClick($event)" (contextmenu)="onNodeRightClick($event)"
                                 (touchend)="onNodeTouchEnd()" (keydown)="onNodeKeydown($event)">
-                                <span class="p-tree-toggler pi pi-fw" [ngClass]="{'pi-plus':!node.expanded,'pi-minus':node.expanded}" *ngIf="!isLeaf()" (click)="toggle($event)"></span>
+                                <span [attr.aria-label]="tree.togglerAriaLabel" class="p-tree-toggler pi pi-fw" [ngClass]="{'pi-plus':!node.expanded,'pi-minus':node.expanded}" *ngIf="!isLeaf()" (click)="toggle($event)"></span>
                                 <span [class]="getIcon()" *ngIf="node.icon||node.expandedIcon||node.collapsedIcon"></span>
                                 <span class="p-treenode-label">
                                     <span *ngIf="!tree.getTemplateForNode(node)">{{node.label}}</span>
@@ -521,11 +521,11 @@ export class UITreeNode implements OnInit {
                 <i [class]="'p-tree-loading-icon pi-spin ' + loadingIcon"></i>
             </div>
             <ng-container *ngTemplateOutlet="headerTemplate"></ng-container>
-            <div *ngIf="filter" class="p-tree-filter-container">
-                <input #filter type="text" autocomplete="off" class="p-tree-filter p-inputtext p-component" [attr.placeholder]="filterPlaceholder"
-                    (keydown.enter)="$event.preventDefault()" (input)="_filter($event.target.value)">
-                    <span class="p-tree-filter-icon pi pi-search"></span>
-            </div>
+                <div *ngIf="filter" class="p-tree-filter-container">
+                    <input #filter type="text" autocomplete="off" class="p-tree-filter p-inputtext p-component" [attr.placeholder]="filterPlaceholder"
+                        (keydown.enter)="$event.preventDefault()" (input)="_filter($event.target.value)">
+                        <span class="p-tree-filter-icon pi pi-search"></span>
+                </div>
             <ng-container *ngIf="!virtualScroll; else virtualScrollList">
                 <div class="p-tree-wrapper" [style.max-height]="scrollHeight">
                     <ul class="p-tree-container" *ngIf="getRootNode()" role="tree" [attr.aria-label]="ariaLabel" [attr.aria-labelledby]="ariaLabelledBy">
@@ -626,6 +626,8 @@ export class Tree implements OnInit,AfterContentInit,OnChanges,OnDestroy,Blockab
 
     @Input() ariaLabel: string;
 
+    @Input() togglerAriaLabel: string;
+
     @Input() ariaLabelledBy: string;
 
     @Input() validateDrop: boolean;
@@ -637,6 +639,8 @@ export class Tree implements OnInit,AfterContentInit,OnChanges,OnDestroy,Blockab
     @Input() filterMode: string = 'lenient';
 
     @Input() filterPlaceholder: string;
+
+    @Input() filteredNodes: TreeNode[];
 
     @Input() filterLocale: string;
 
@@ -689,8 +693,6 @@ export class Tree implements OnInit,AfterContentInit,OnChanges,OnDestroy,Blockab
     public dragStartSubscription: Subscription;
 
     public dragStopSubscription: Subscription;
-
-    public filteredNodes: TreeNode[];
 
     constructor(public el: ElementRef, @Optional() public dragDropService: TreeDragDropService, public config: PrimeNGConfig) {}
 

@@ -1,5 +1,5 @@
 import {NgModule,Component,Input,Output,OnDestroy,EventEmitter,Renderer2,ElementRef,ChangeDetectorRef,NgZone,
-        ContentChildren,TemplateRef,AfterContentInit,QueryList,ChangeDetectionStrategy, ViewEncapsulation} from '@angular/core';
+        ContentChildren,TemplateRef,AfterContentInit,QueryList,ChangeDetectionStrategy, ViewEncapsulation, ViewRef} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {DomHandler, ConnectedOverlayScrollHandler} from 'primeng/dom';
 import {SharedModule,PrimeTemplate, PrimeNGConfig, OverlayService} from 'primeng/api';
@@ -14,7 +14,7 @@ import { Subscription } from 'rxjs';
         <div *ngIf="render" [ngClass]="'p-overlaypanel p-component'" [ngStyle]="style" [class]="styleClass" (click)="onOverlayClick($event)"
             [@animation]="{value: (overlayVisible ? 'open': 'close'), params: {showTransitionParams: showTransitionOptions, hideTransitionParams: hideTransitionOptions}}"
                 (@animation.start)="onAnimationStart($event)" (@animation.done)="onAnimationEnd($event)">
-            <div class="p-overlaypanel-content">
+            <div class="p-overlaypanel-content" (click)="onContentClick()" (mousedown)="onContentClick()">
                 <ng-content></ng-content>
                 <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
             </div>
@@ -180,6 +180,10 @@ export class OverlayPanel implements AfterContentInit, OnDestroy {
         this.selfClick = true;
     }
 
+    onContentClick() {
+        this.selfClick = true;
+    }
+
     hasTargetChanged(event, target) {
         return this.target != null && this.target !== (target||event.currentTarget||event.target);
     }
@@ -327,7 +331,10 @@ export class OverlayPanel implements AfterContentInit, OnDestroy {
     }
 
     onContainerDestroy() {
-        this.target = null;
+        if (!(this.cd as ViewRef).destroyed) {
+            this.target = null;
+        }
+
         this.unbindDocumentClickListener();
         this.unbindDocumentResizeListener();
         this.unbindScrollListener();
@@ -343,7 +350,10 @@ export class OverlayPanel implements AfterContentInit, OnDestroy {
             ZIndexUtils.clear(this.container);
         }
 
-        this.target = null;
+        if (!(this.cd as ViewRef).destroyed) {
+            this.target = null;
+        }
+
         this.destroyCallback = null;
         if (this.container) {
             this.restoreAppend();

@@ -17,19 +17,19 @@ import { TooltipModule } from 'primeng/tooltip';
                 <li *ngIf="child.separator" #menuitem class="p-menu-separator" [ngClass]="{'p-hidden': child.visible === false}" role="separator">
                 <li *ngIf="!child.separator" #menuitem [ngClass]="{'p-menuitem':true,'p-menuitem-active': isActive(getKey(index)),'p-hidden': child.visible === false}" [ngStyle]="child.style" [class]="child.styleClass" pTooltip [tooltipOptions]="child.tooltipOptions"
                     (mouseenter)="onItemMouseEnter($event,child,getKey(index))" (mouseleave)="onItemMouseLeave($event,child)" role="none" [attr.data-ik]="getKey(index)">
-                    <a *ngIf="!child.routerLink" [attr.href]="child.url ? child.url : null" [attr.target]="child.target" [attr.title]="child.title" [attr.id]="child.id"
+                    <a *ngIf="!child.routerLink" [attr.href]="child.url ? child.url : null" [target]="child.target" [attr.title]="child.title" [attr.id]="child.id"
                         [attr.tabindex]="child.disabled ? null : '0'" (click)="onItemClick($event, child, menuitem, getKey(index))" [ngClass]="{'p-menuitem-link':true,'p-disabled':child.disabled}" pRipple
                         [attr.aria-haspopup]="item.items != null" [attr.aria-expanded]="isActive(getKey(index))">
-                        <span class="p-menuitem-icon" *ngIf="child.icon" [ngClass]="child.icon"></span>
+                        <span class="p-menuitem-icon" *ngIf="child.icon" [ngClass]="child.icon" [ngStyle]="child.iconStyle"></span>
                         <span class="p-menuitem-text" *ngIf="child.escape !== false; else htmlLabel">{{child.label}}</span>
                         <ng-template #htmlLabel><span class="p-menuitem-text" [innerHTML]="child.label"></span></ng-template>
                         <span class="p-submenu-icon pi pi-angle-right" *ngIf="child.items"></span>
                     </a>
                     <a *ngIf="child.routerLink" [routerLink]="child.routerLink" [queryParams]="child.queryParams" [routerLinkActive]="'p-menuitem-link-active'" role="menuitem"
-                        [routerLinkActiveOptions]="child.routerLinkActiveOptions||{exact:false}" [attr.target]="child.target" [attr.title]="child.title" [attr.id]="child.id" [attr.tabindex]="child.disabled ? null : '0'"
+                        [routerLinkActiveOptions]="child.routerLinkActiveOptions||{exact:false}" [target]="child.target" [attr.title]="child.title" [attr.id]="child.id" [attr.tabindex]="child.disabled ? null : '0'"
                         (click)="onItemClick($event, child, menuitem, getKey(index))" [ngClass]="{'p-menuitem-link':true,'p-disabled':child.disabled}"
                          pRipple [fragment]="child.fragment" [queryParamsHandling]="child.queryParamsHandling" [preserveFragment]="child.preserveFragment" [skipLocationChange]="child.skipLocationChange" [replaceUrl]="child.replaceUrl" [state]="child.state">
-                        <span class="p-menuitem-icon" *ngIf="child.icon" [ngClass]="child.icon"></span>
+                        <span class="p-menuitem-icon" *ngIf="child.icon" [ngClass]="child.icon" [ngStyle]="child.iconStyle"></span>
                         <span class="p-menuitem-text" *ngIf="child.escape !== false; else htmlRouteLabel">{{child.label}}</span>
                         <ng-template #htmlRouteLabel><span class="p-menuitem-text" [innerHTML]="child.label"></span></ng-template>
                         <span class="p-submenu-icon pi pi-angle-right" *ngIf="child.items"></span>
@@ -212,6 +212,8 @@ export class ContextMenu implements AfterViewInit, OnDestroy {
 
     documentClickListener: any;
 
+    documentTriggerListener: any;
+
     documentKeydownListener: any;
 
     windowResizeListener: any;
@@ -219,6 +221,8 @@ export class ContextMenu implements AfterViewInit, OnDestroy {
     triggerEventListener: any;
 
     ngDestroy$ = new Subject();
+
+    preventDocumentDefault: boolean = false;
 
     constructor(public el: ElementRef, public renderer: Renderer2, public cd: ChangeDetectorRef, public zone: NgZone, public contextMenuService: ContextMenuService, private config: PrimeNGConfig) { }
 
@@ -235,7 +239,6 @@ export class ContextMenu implements AfterViewInit, OnDestroy {
             this.triggerEventListener = this.renderer.listen(this.target, this.triggerEvent, (event) => {
                 this.show(event);
                 event.preventDefault();
-                event.stopPropagation();
             });
         }
 
@@ -252,6 +255,7 @@ export class ContextMenu implements AfterViewInit, OnDestroy {
         this.position(event);
         this.moveOnTop();
         this.containerViewChild.nativeElement.style.display = 'block';
+        this.preventDocumentDefault = true;
         DomHandler.fadeIn(this.containerViewChild.nativeElement, 250);
         this.bindGlobalListeners();
 
@@ -269,6 +273,7 @@ export class ContextMenu implements AfterViewInit, OnDestroy {
             ZIndexUtils.clear(this.containerViewChild.nativeElement);
         }
 
+        this.clearActiveItem();
         this.unbindGlobalListeners();
         this.onHide.emit();
     }
@@ -416,6 +421,13 @@ export class ContextMenu implements AfterViewInit, OnDestroy {
                 if (this.containerViewChild.nativeElement.offsetParent && this.isOutsideClicked(event) && !event.ctrlKey && event.button !== 2) {
                     this.hide();
                 }
+            });
+
+            this.documentTriggerListener = this.renderer.listen(documentTarget, this.triggerEvent, (event) => {
+                if (this.containerViewChild.nativeElement.offsetParent && this.isOutsideClicked(event) && !this.preventDocumentDefault) {
+                    this.hide();
+                }
+                this.preventDocumentDefault = false;
             });
         }
 
@@ -571,6 +583,11 @@ export class ContextMenu implements AfterViewInit, OnDestroy {
         if (this.documentClickListener) {
             this.documentClickListener();
             this.documentClickListener = null;
+        }
+
+        if (this.documentTriggerListener) {
+            this.documentTriggerListener();
+            this.documentTriggerListener = null;
         }
 
         if (this.windowResizeListener) {
